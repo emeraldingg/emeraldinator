@@ -91,7 +91,6 @@ module.exports = class Blackjack {
       this.deck[i] = this.deck[j];
       this.deck[j] = mische;
     }
-    console.log("Erfolgreich gemischt.");
   }
 
   canSplit() {
