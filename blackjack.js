@@ -35,6 +35,10 @@ module.exports = class Blackjack {
     this.msg = msg;
     this.endCallback = endCallback;
 
+    this.editMsg = null;
+    this.permissionManageMsg = msg.guild && msg.channel
+      .permissionsFor(msg.guild.me)
+      .has(Discord.Permissions.FLAGS.MANAGE_MESSAGES);
     this.spielerKarten = [];
     this.dealerKarten = [];
     this.deck = [];
@@ -56,6 +60,12 @@ module.exports = class Blackjack {
     this.anzeigen();
   }
 
+  async sendMessage(text) {
+    if (!this.editMsg || !this.permissionManageMsg) this.editMsg = await this.msg.reply(text);
+    else this.editMsg.edit(text);
+    return this.editMsg;
+  }
+
   async anzeigen() {
     let summeSpieler = this.score(this.spielerKarten);
     let nachricht =
@@ -65,8 +75,7 @@ module.exports = class Blackjack {
     nachricht += "These are the dealer's cards:\n";
     nachricht += this.dealerKarten[0] + " ❔\n";
     nachricht += "➕ = Hit, ➖ = Stand";
-    const reactMsg = await this.msg.reply(nachricht);
-    this.options(reactMsg);
+    this.options(await this.sendMessage(nachricht));
   }
 
   anzeigenDealer() {
@@ -78,7 +87,7 @@ module.exports = class Blackjack {
     nachricht += "These are the dealer's cards:\n";
     nachricht += this.dealerKarten.join(" ") + "\n";
     nachricht += "The dealer's sum: " + summeDealer;
-    this.msg.reply(nachricht);
+    this.sendMessage(nachricht);
   }
 
   mischen() {
@@ -158,6 +167,7 @@ module.exports = class Blackjack {
           default:
             console.log("Das darf nicht passieren");
         }
+        if (this.permissionManageMsg) r.users.remove(this.msg.author);
       });
       collector.on("end", (collected) => {
         if (collected.size === 0) {
@@ -205,10 +215,16 @@ module.exports = class Blackjack {
       this.msg.reply("Sorry, but you lost. You busted your hand.");
     } else if (dealerScore >= 22 && spielerScore <= 21) {
       this.msg.reply("You won! The dealer busted it's hand.");
-    } else if ((spielerScore === dealerScore) && (spielerScore <=21) && (dealerScore <= 21)) {
+    } else if (
+      spielerScore === dealerScore &&
+      spielerScore <= 21 &&
+      dealerScore <= 21
+    ) {
       this.msg.reply("Tie! You both have the same score.");
     } else if (spielerScore >= 22 && dealerScore >= 22) {
-      this.msg.reply("You loose, although the dealer and you busted their hands.");
+      this.msg.reply(
+        "You loose, although the dealer and you busted their hands."
+      );
     } else {
       console.log(
         "Das darf nicht passieren!?!?!?!??!?!?!",
