@@ -206,10 +206,10 @@ module.exports = class Blackjack {
       this.msg.reply("Sorry, but you lost. You busted your hand.");
     } else if (dealerScore >= 22 && spielerScore <= 21) {
       this.msg.reply("You won! The dealer busted it's hand.");
-    } else if (spielerScore === dealerScore) {
+    } else if ((spielerScore === dealerScore) && (spielerScore <=21) && (dealerScore <= 21)) {
       this.msg.reply("Tie! You both have the same score.");
     } else if (spielerScore >= 22 && dealerScore >= 22) {
-      this.msg.reply("You loose, although the dealer and you busted.");
+      this.msg.reply("You loose, although the dealer and you busted their hands.");
     } else {
       console.log(
         "Das darf nicht passieren!?!?!?!??!?!?!",

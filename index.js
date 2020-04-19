@@ -65,6 +65,12 @@ client.on("message", async (msg) => {
         msg.reply(randomNumber(args[0]));
       }
       break;
+    case "help":
+      msg.reply("Sent you a DM!");
+      break;
+    case "invite":
+      msg.reply("");
+      break;
     case "blackjack":
       if (blackjackGames[msg.author.id]) {
         if (args[0] && args[0] === "end") {
