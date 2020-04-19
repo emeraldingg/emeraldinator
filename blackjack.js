@@ -71,7 +71,7 @@ module.exports = class Blackjack {
 
   anzeigenDealer() {
     let summeSpieler = this.score(this.spielerKarten);
-    let summeDealer = this.score(this.dealerKarten)
+    let summeDealer = this.score(this.dealerKarten);
     let nachricht = "";
     nachricht += this.spielerKarten.join(" ") + "\n";
     nachricht += "Your sum: " + summeSpieler + "\n";
@@ -206,11 +206,10 @@ module.exports = class Blackjack {
       this.msg.reply("Sorry, but you lost. You busted your hand.");
     } else if (dealerScore >= 22 && spielerScore <= 21) {
       this.msg.reply("You won! The dealer busted it's hand.");
-    } else if (
-      spielerScore === dealerScore ||
-      (spielerScore >= 22 && dealerScore >= 22)
-    ) {
-      this.msg.reply("Tie! You bove busted or had the same score.");
+    } else if (spielerScore === dealerScore) {
+      this.msg.reply("Tie! You both have the same score.");
+    } else if (spielerScore >= 22 && dealerScore >= 22) {
+      this.msg.reply("You loose, although the dealer and you busted.");
     } else {
       console.log(
         "Das darf nicht passieren!?!?!?!??!?!?!",
@@ -219,7 +218,7 @@ module.exports = class Blackjack {
       );
     }
     if (this.dealerKarten.length === 2) {
-    this.anzeigenDealer();
+      this.anzeigenDealer();
     }
     this.end();
   }
