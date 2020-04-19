@@ -100,12 +100,11 @@ client.on("message", async (msg) => {
       msg.author.send("", { embed: help });
       break;
     case "invite":
-      msg.reply("Sent you a DM!");
       const invite = new Discord.MessageEmbed()
         .setColor(randomColor())
         .setTitle("Invite this bot to your server with this link:")
         .addField("Bot invite:", `${config.invite}`);
-      msg.author.send("", { embed: invite });
+      msg.reply("", { embed: invite });
       break;
     case "serverinvite":
       if (msg.member.hasPermission("CREATE_INSTANT_INVITE")) {
