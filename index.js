@@ -50,7 +50,8 @@ client.on("message", async (msg) => {
         .setColor(randomColor())
         .setTitle("Katze")
         .setImage(catObj.file)
-        .setURL(catObj.file);
+        .setURL(catObj.file)
+        .setFooter("Powered by random.cat");
       msg.reply(embed);
       break;
     case "about":
@@ -107,7 +108,7 @@ client.on("message", async (msg) => {
       msg.reply("", { embed: invite });
       break;
     case "serverinvite":
-      if (msg.member.hasPermission("CREATE_INSTANT_INVITE")) {
+      if ((msg.guild) && (msg.member.hasPermission("CREATE_INSTANT_INVITE"))) {
         serverInvite(msg);
         msg.reply("Sent you a DM!");
       } else {
