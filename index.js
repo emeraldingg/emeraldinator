@@ -48,7 +48,7 @@ client.on("message", async (msg) => {
       const catObj = await (await fetch("http://aws.random.cat/meow")).json();
       const embed = new Discord.MessageEmbed()
         .setColor(randomColor())
-        .setTitle("Katze")
+        .setTitle("Cat")
         .setImage(catObj.file)
         .setURL(catObj.file)
         .setFooter("Powered by random.cat");
