@@ -48,7 +48,7 @@ client.on("message", async (msg) => {
       const catObj = await (await fetch("http://aws.random.cat/meow")).json();
       const embed = new Discord.MessageEmbed()
         .setColor(randomColor())
-        .setTitle("Katze")
+        .setTitle("Cat")
         .setImage(catObj.file)
         .setURL(catObj.file)
         .setFooter("Powered by random.cat");
@@ -62,10 +62,12 @@ client.on("message", async (msg) => {
     case "randomnumber":
       if (!args[0] || isNaN(args[0])) {
         msg.reply(
-          `Correct usage: ${config.prefix}randomnumber <highest number>`
+          `Correct usage: ${config.prefix}randomnumber <highest number> or ${config.prefix}randomnumber <lowest number> <highest number>`
         );
+      } else if (!args[1] || isNaN(args[1])) {
+        msg.reply(randomNumber(0, Math.round(args[0])));
       } else {
-        msg.reply(randomNumber(args[0]));
+        msg.reply(randomNumber(Math.round(args[0]), Math.round(args[1])));
       }
       break;
     case "help":
@@ -85,7 +87,7 @@ client.on("message", async (msg) => {
         .addField(`${config.prefix}about`, `Shows informations about the bot.`)
         .addField(
           `${config.prefix}randomnumber`,
-          `Creates a random number. Correct usage: ${config.prefix}randomnumber <highest number>`
+          `Creates a random number. Correct usage: ${config.prefix}randomnumber <highest number> or ${config.prefix}randomnumber <lowest number> <highest number>`
         )
         .addField(
           `${config.prefix}cat`,
@@ -223,8 +225,8 @@ function findGoodChannel(guild) {
 function randomColor() {
   return Math.floor(Math.random() * 16777215);
 }
-function randomNumber(max) {
-  return Math.floor(Math.random() * max);
+function randomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 async function serverInvite(msg) {
   let invite = await msg.channel.createInvite(
