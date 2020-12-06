@@ -4,6 +4,7 @@ const client = new Discord.Client();
 const fetch = require("node-fetch");
 
 const config = require("./config.json");
+const { version } = require("./package.json");
 
 const Blackjack = require("./blackjack");
 
@@ -20,12 +21,12 @@ client.on("ready", () => {
 
 client.on("message", async (msg) => {
   if (msg.author.bot) return;
+  if (!msg.content.startsWith(config.prefix)) return;
   // Blacklist
   if (config.blacklist.includes(msg.author.id)) {
     msg.author.send("You ain't doing that!");
     return;
   }
-  if (!msg.content.startsWith(config.prefix)) return;
   const args = msg.content.substr(config.prefix.length).split(/ +/);
   const cmd = args.shift().toLowerCase();
 
@@ -56,7 +57,7 @@ client.on("message", async (msg) => {
       break;
     case "about":
       msg.reply(
-        `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: 1.0.0\nInvite: ${config.invite}`
+        `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
       );
       break;
     case "randomnumber":
@@ -110,7 +111,7 @@ client.on("message", async (msg) => {
       msg.reply("", { embed: invite });
       break;
     case "serverinvite":
-      if ((msg.guild) && (msg.member.hasPermission("CREATE_INSTANT_INVITE"))) {
+      if (msg.guild && msg.member.hasPermission("CREATE_INSTANT_INVITE")) {
         serverInvite(msg);
         msg.reply("Sent you a DM!");
       } else {
@@ -139,7 +140,7 @@ client.on("message", async (msg) => {
         .setColor(randomColor())
         .setTitle("Stats of emeraldinator:")
         .setDescription(
-          `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: 1.0.0\nInvite: ${config.invite}`
+          `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
         )
         .setThumbnail(client.user.avatarURL())
         .addField("Author:", "emeraldingg#2697")
@@ -162,14 +163,17 @@ client.on("message", async (msg) => {
         client.guilds.cache.forEach((guild) => {
           const channel = findGoodChannel(guild);
           if (channel) {
-            channel.send(text)
-            .catch(console.error);
+            channel.send(text).catch(console.error);
           } else {
-           errorGuilds.push(guild.name);
+            errorGuilds.push(guild.name);
           }
         });
         if (errorGuilds.length > 0) {
-          msg.reply(`Could not announce to the following servers ${errorGuilds.join(", ")}`);
+          msg.reply(
+            `Could not announce to the following servers ${errorGuilds.join(
+              ", "
+            )}`
+          );
         }
       } else {
         msg.author.send("You ain't doing that!");
@@ -204,7 +208,7 @@ client.on("guildCreate", async (guild) => {
   const channel = findGoodChannel(guild);
   if (channel) {
     channel.send(
-      `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: 1.0.0\nInvite: ${config.invite}`
+      `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
     );
   }
 });
