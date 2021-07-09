@@ -180,9 +180,9 @@ client.on("message", async (msg) => {
       }
       break;
     case "reboot":
-      if (message.author.id === config.owner) {
-        message.reply("Restarting!").then(function () {
-          console.log("Restarted by " + message.author.username);
+      if (msg.author.id === config.owner) {
+        msg.reply("Restarting!").then(function () {
+          console.log("Restarted by " + msg.author.username);
           process.exit(0);
         });
       }
@@ -195,10 +195,14 @@ client.on("message", async (msg) => {
           msg.reply("You are already playing blackjack!");
         }
       } else {
-        blackjackGames[msg.author.id] = new Blackjack(msg, () => {
+        if (!args[0]) {
+          blackjackGames[msg.author.id] = new Blackjack(msg, () => {
           delete blackjackGames[msg.author.id];
         });
         blackjackGames[msg.author.id].start();
+        } else {
+          msg.reply("Wrong usage!");
+        }
       }
       break;
   }

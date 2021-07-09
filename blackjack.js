@@ -150,12 +150,12 @@ module.exports = class Blackjack {
       const filter = (reaction, user) =>
         (reaction.emoji.name === "➕" || reaction.emoji.name === "➖") &&
         user.id === this.msg.author.id;
-      const collector = reactMsg.createReactionCollector(filter, {
+      this.collector = reactMsg.createReactionCollector(filter, {
         time: 30000,
         max: 1,
         dispose: true,
       });
-      collector.on("collect", (r) => {
+      this.collector.on("collect", (r) => {
         switch (r.emoji.toString()) {
           case "➕":
             this.hit(this.spielerKarten);
@@ -169,7 +169,8 @@ module.exports = class Blackjack {
         }
         if (this.permissionManageMsg) r.users.remove(this.msg.author);
       });
-      collector.on("end", (collected) => {
+      this.collector.on("end", (collected, reason) => {
+        if (reason === "blackjack end") return;
         if (collected.size === 0) {
           this.msg.reply("Sorry, but you ran out of time.");
           this.end();
@@ -239,6 +240,9 @@ module.exports = class Blackjack {
   }
 
   end() {
+    if (this.collector) {
+      this.collector.stop("blackjack end");
+    }
     this.msg.reply("Blackjack ended.");
     this.deck = [];
     this.endCallback();
