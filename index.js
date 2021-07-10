@@ -2,13 +2,17 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 
 const fetch = require("node-fetch");
+const prefix = require('discord-prefix');
 
 const config = require("./config.json");
 const { version } = require("./package.json");
 
+
 const Blackjack = require("./blackjack");
 
 const blackjackGames = {};
+
+let defaultPrefix = '+';
 
 // Invite: https://discordapp.com/oauth2/authorize?client_id=700026092718915626&scope=bot&permissions=8
 
@@ -21,13 +25,21 @@ client.on("ready", () => {
 
 client.on("message", async (msg) => {
   if (msg.author.bot) return;
-  if (!msg.content.startsWith(config.prefix)) return;
+  if (!msg.guild) {
+    //msg.reply("Sorry, but this bot only works in servers.")
+    return;
+  }
+
+  let guildPrefix = prefix.getPrefix(msg.guild.id);
+  if (!guildPrefix) guildPrefix = defaultPrefix;
+
+  if (!msg.content.startsWith(guildPrefix)) return;
   // Blacklist
   if (config.blacklist.includes(msg.author.id)) {
     msg.author.send("You ain't doing that!");
     return;
   }
-  const args = msg.content.substr(config.prefix.length).split(/ +/);
+  const args = msg.content.substr(guildPrefix.length).split(/ +/);
   const cmd = args.shift().toLowerCase();
 
   switch (cmd) {
@@ -45,6 +57,22 @@ client.on("message", async (msg) => {
         msg.author.send("You ain't doing that!");
       }
       break;
+    case "changeprefix":
+      if (!msg.member.hasPermission("MANAGE_GUILD")) {
+        msg.author.send("You ain't doing that!");
+      }
+      else if (!args[0] || args[0] === "help") {
+        msg.reply(`Correct usage: ${guildPrefix}changeprefix <desired prefix>`)
+      }
+      else if (args[0].length > 3) {
+        msg.reply("Your prefix can't be longer than 3 characters!")
+      }
+      else {
+        prefix.setPrefix(args[0], msg.guild.id);
+        guildPrefix = prefix.getPrefix(msg.guild.id);
+        msg.reply(`Prefix changed to ${guildPrefix}`);
+      }
+      break;
     case "cat":
       const catObj = await (await fetch("http://aws.random.cat/meow")).json();
       const embed = new Discord.MessageEmbed()
@@ -57,13 +85,13 @@ client.on("message", async (msg) => {
       break;
     case "about":
       msg.reply(
-        `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
+        `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${guildPrefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
       );
       break;
     case "randomnumber":
       if (!args[0] || isNaN(args[0])) {
         msg.reply(
-          `Correct usage: ${config.prefix}randomnumber <highest number> or ${config.prefix}randomnumber <lowest number> <highest number>`
+          `Correct usage: ${guildPrefix}randomnumber <highest number> or ${guildPrefix}randomnumber <lowest number> <highest number>`
         );
       } else if (!args[1] || isNaN(args[1])) {
         msg.reply(randomNumber(0, Math.round(args[0])));
@@ -81,26 +109,27 @@ client.on("message", async (msg) => {
           `Invite this bot to your server with this link: ${config.invite}`
         )
         .addField(
-          `${config.prefix}blackjack`,
+          `${guildPrefix}blackjack`,
           `Play Blackjack for free with the bot as a dealer!`
         )
-        .addField(`${config.prefix}help`, `Loads this page.`)
-        .addField(`${config.prefix}about`, `Shows informations about the bot.`)
+        .addField(`${guildPrefix}help`, `Loads this page.`)
+        .addField(`${guildPrefix}about`, `Shows informations about the bot.`)
+        .addField(`${guildPrefix}changeprefix`, `Changes the prefix for this server. Requires the Manage Server Permission.`)
         .addField(
-          `${config.prefix}randomnumber`,
-          `Creates a random number. Correct usage: ${config.prefix}randomnumber <highest number> or ${config.prefix}randomnumber <lowest number> <highest number>`
+          `${guildPrefix}randomnumber`,
+          `Creates a random number. Correct usage: ${guildPrefix}randomnumber <highest number> or ${guildPrefix}randomnumber <lowest number> <highest number>`
         )
         .addField(
-          `${config.prefix}cat`,
+          `${guildPrefix}cat`,
           `Displays a random cat from www.random.cat.`
         )
-        .addField(`${config.prefix}ping`, `The bot responds with Pong.`)
+        .addField(`${guildPrefix}ping`, `The bot responds with Pong.`)
         .addField(
-          `${config.prefix}invite`,
+          `${guildPrefix}invite`,
           `Shows the invite link for this bot.`
         )
-        .addField(`${config.prefix}serverinvite`, `Creates a server invite.`)
-        .addField(`${config.prefix}stats`, `Shows some stats about this bot.`);
+        .addField(`${guildPrefix}serverinvite`, `Creates a server invite.`)
+        .addField(`${guildPrefix}stats`, `Shows some stats about this bot.`);
       msg.author.send("", { embed: help });
       break;
     case "invite":
@@ -140,7 +169,7 @@ client.on("message", async (msg) => {
         .setColor(randomColor())
         .setTitle("Stats of emeraldinator:")
         .setDescription(
-          `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
+          `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${guildPrefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
         )
         .setThumbnail(client.user.avatarURL())
         .addField("Author:", "emeraldingg#2697")
@@ -212,7 +241,7 @@ client.on("guildCreate", async (guild) => {
   const channel = findGoodChannel(guild);
   if (channel) {
     channel.send(
-      `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${config.prefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
+      `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${guildPrefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
     );
   }
 });
