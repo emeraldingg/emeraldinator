@@ -12,7 +12,7 @@ const Blackjack = require("./blackjack");
 
 const blackjackGames = {};
 
-let defaultPrefix = '+';
+let defaultPrefix = config.defaultPrefix;
 
 // Invite: https://discordapp.com/oauth2/authorize?client_id=700026092718915626&scope=bot&permissions=8
 
@@ -239,6 +239,8 @@ client.on("message", async (msg) => {
 
 client.on("guildCreate", async (guild) => {
   const channel = findGoodChannel(guild);
+  let guildPrefix = prefix.getPrefix(guild.id);
+  if (!guildPrefix) guildPrefix = defaultPrefix;
   if (channel) {
     channel.send(
       `Hello! I'm a useful bot created by the developer and discord user emeraldingg#2697. My prefix is ${guildPrefix}. You can use me for getting a cat picture, creating random stuff and playing blackjack.\nI hope you have fun! Version: ${version}\nInvite: ${config.invite}`
