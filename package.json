@@ -12,6 +12,6 @@
     "better-sqlite3": "^7.4.1",
     "discord-prefix": "^2.0.0",
     "discord.js": "^12.5.3",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.7"
   }
 }
